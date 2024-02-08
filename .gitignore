@@ -1,0 +1,7 @@
+.vscode/*
+*.zip
+*.png
+*.pdf
+*__MACOSX*
+*__pycache__*
+*.npy
