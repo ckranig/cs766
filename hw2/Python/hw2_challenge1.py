@@ -198,6 +198,21 @@ def hw2_challenge1c():
 
         recognizeObjects(orig_img, labeled_img, obj_db,
                          f'outputs/testing1c_{img_list[i]}')
+    
+    img_list2 = ['many_objects_2.png', 'two_objects.png']
+    labeled_two_obj = Image.open('outputs/labeled_many_objects_1.png')
+    labeled_two_obj = np.array(labeled_two_obj)
+    orig_img = Image.open('data/many_objects_1.png')
+    orig_img = np.array(orig_img.convert('L')) / 255.
+    obj_db2  = compute2DProperties(orig_img, labeled_two_obj)
+    for i in range(len(img_list2)):
+        labeled_img = Image.open(f'outputs/labeled_{img_list2[i]}')
+        labeled_img = np.array(labeled_img)
+        orig_img = Image.open(f"data/{img_list2[i]}")
+        orig_img = np.array(orig_img.convert('L')) / 255.
+
+        recognizeObjects(orig_img, labeled_img, obj_db2,
+                         f'outputs/testing1c_part2_{img_list2[i]}')
 
 if __name__ == "__main__":
     #hw2_challenge1a()
