@@ -5,3 +5,5 @@
 *__MACOSX*
 *__pycache__*
 *.npy
+*outputs*
+*.DS_Store
