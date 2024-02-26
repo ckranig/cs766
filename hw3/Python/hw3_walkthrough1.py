@@ -71,7 +71,7 @@ def hw3_walkthrough1():
     gray_img = np.array(gray_img)
 
     # Sobel edge detection
-    thresh = 0.15
+    thresh = 0.2
     edge_img = filters.sobel(gray_img) > thresh
     axs[1, 0].imshow(edge_img, cmap='gray')
     axs[1, 0].set_title('Sobel Edge Detection')

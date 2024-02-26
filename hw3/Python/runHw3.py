@@ -6,7 +6,7 @@ from PIL import Image
 import argparse
 import numpy as np
 from runTests import run_tests
-
+from skimage import feature, filters
 
 def runHw3():
     # runHw3 is the "main" interface that lets you execute all the 
@@ -63,10 +63,13 @@ def challenge1a():
         img = Image.open(f"data/{fn}")
 
         # Apply edge detection to grayscale image
-        # edge_img = ???
+        gray_img = np.array(img.convert('L'))
+        edge_img = feature.canny(gray_img, sigma=0.5)
+        #edge_img = filters.sobel(gray_img) > 0.05
 
         # Save the edge detected image
         edge_img = Image.fromarray((edge_img * 255).astype(np.uint8))
+        #edge_img.save(f'outputs/sobel_edge_{fn}')
         edge_img.save(f'outputs/edge_{fn}')
 
 def challenge1b():
@@ -74,8 +77,10 @@ def challenge1b():
 
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    # rho_num_bins = ??;
-    # theta_num_bins = ??;
+    rho_num_bins = 768*2
+    theta_num_bins = 180
+    #rho_num_bins = 768
+    #theta_num_bins = 90
 
     for i, fn in enumerate(img_list):
         # Load the edge image from challenge1a
@@ -94,7 +99,7 @@ def challenge1c():
 
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    # hough_threshold = [??, ??, ??];
+    hough_threshold = [110, 60, 90]
 
     for i, fn in enumerate(img_list):
         orig_img = Image.open(f"data/{fn}")
@@ -110,7 +115,7 @@ def challenge1d():
     from hw3_challenge1 import lineSegmentFinder
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    # hough_threshold = [??, ??, ??];
+    hough_threshold = [110, 60, 90]
 
     for i, fn in enumerate(img_list):
         orig_img = Image.open(f"data/{fn}")
