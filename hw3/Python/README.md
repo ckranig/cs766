@@ -3,10 +3,11 @@
 I solved the equation: ρ = x cos θ + y sin θ
 For each theta bin I chose the rho bin that was closest to x cos θ + y sin θ. I only chose a single bin as opposed to a patch of bins.
 This single bin approach gave me good results so I kept it.
+For the number of bins I had one θ bin per degree between -90 and 90, and I had one bin for each integer between -Image_Diagonal and Image_Diagonal.
 
 # Challenge 1c
 
-I used a simple threshold method where I chose any entries in the accumulator that were above the threshold to draw lines for.
+I started off by sorting all of the lines by their accumulator value. I then grouped all lines that where within 5 indices of each other before using a simple threshold method to weed out unwanted lines.
 
 # Challenge 1d
 

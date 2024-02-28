@@ -79,8 +79,8 @@ def challenge1b():
 
     rho_num_bins = 768*2
     theta_num_bins = 180
-    #rho_num_bins = 768
-    #theta_num_bins = 90
+    #rho_num_bins = int(768/4)
+    #theta_num_bins = 45
 
     for i, fn in enumerate(img_list):
         # Load the edge image from challenge1a
@@ -99,7 +99,7 @@ def challenge1c():
 
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    hough_threshold = [110, 60, 90]
+    hough_threshold = [90, 50, 100]
 
     for i, fn in enumerate(img_list):
         orig_img = Image.open(f"data/{fn}")
@@ -115,7 +115,7 @@ def challenge1d():
     from hw3_challenge1 import lineSegmentFinder
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    hough_threshold = [110, 60, 90]
+    hough_threshold = [50, 50, 50]
 
     for i, fn in enumerate(img_list):
         orig_img = Image.open(f"data/{fn}")
@@ -131,4 +131,7 @@ def challenge1d():
         line_segement_img.save(f'outputs/croppedline_{fn}')
 
 if __name__ == '__main__':
+    #challenge1b()
+    #challenge1c()
+    #challenge1d()
     runHw3()

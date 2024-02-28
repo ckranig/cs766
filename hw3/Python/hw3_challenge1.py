@@ -27,13 +27,14 @@ def generateHoughAccumulator(edge_image: np.ndarray, theta_num_bins: int, rho_nu
 
     # Iterate through only edge pixels
     y_idxs, x_idxs = np.nonzero(edge_image)  # (row, col) indexes to edges
+    dist = 0
     for edge_idx in range(len(y_idxs)):
         x = x_idxs[edge_idx]
         y = y_idxs[edge_idx]
         for theta_idx in range(len(cos_thetas)):
             rho = x*cos_thetas[theta_idx] + y*sin_thetas[theta_idx]
             rho_idx = np.argmin(np.abs(rhos - rho))
-            hough_accumulator[rho_idx, theta_idx] += 1
+            hough_accumulator[max(0,rho_idx-dist):min(rho_num_bins,rho_idx+dist+1), max(0,theta_idx-dist):min(theta_num_bins,theta_idx+dist+1)] += 1
 
     # Scale Results Back
     hough_accumulator = 255 * (hough_accumulator / np.max(hough_accumulator))
@@ -53,7 +54,21 @@ def lineFinder(orig_img: np.ndarray, hough_img: np.ndarray, hough_threshold: flo
     '''
 
     #Only look at peaks
-    hough_peaks = np.column_stack(np.where(hough_img >= hough_threshold))
+    hough_peaks = []
+    hough_img_copy = np.copy(hough_img)
+    sorted_lines = np.column_stack(np.unravel_index(np.argsort(hough_img, axis=None)[::-1], hough_img.shape, order='C'))
+    dist = 5
+    #Combine Lines
+    for rho_idx, theta_idx in sorted_lines:
+        if hough_img[rho_idx,theta_idx] < hough_threshold:
+            break
+        elif hough_img_copy[rho_idx,theta_idx] < hough_threshold:
+            continue
+        hough_img_copy[max(0,rho_idx-dist):min(hough_img.shape[0],rho_idx+dist+1), max(0,theta_idx-dist):min(hough_img.shape[1],theta_idx+dist+1)] = 0
+        hough_peaks.append((rho_idx,theta_idx))
+    #hough_peaks = np.column_stack(np.where(hough_img >= hough_threshold))
+
+    
     #Get bin values
     diag_len = int(np.ceil(math.hypot(orig_img.shape[0], orig_img.shape[1])))  # max_dist
     rhos = np.linspace(-diag_len, diag_len, hough_img.shape[0])
