@@ -64,7 +64,7 @@ def challenge1a():
 
         # Apply edge detection to grayscale image
         gray_img = np.array(img.convert('L'))
-        edge_img = feature.canny(gray_img, sigma=0.5)
+        edge_img = feature.canny(gray_img, sigma=0.5)#, low_threshold=20, high_threshold=50)
         #edge_img = filters.sobel(gray_img) > 0.05
 
         # Save the edge detected image
@@ -115,7 +115,7 @@ def challenge1d():
     from hw3_challenge1 import lineSegmentFinder
     img_list = ['hough_1.png', 'hough_2.png', 'hough_3.png']
 
-    hough_threshold = [50, 50, 50]
+    hough_threshold = [90, 50, 100]
 
     for i, fn in enumerate(img_list):
         orig_img = Image.open(f"data/{fn}")
@@ -131,6 +131,7 @@ def challenge1d():
         line_segement_img.save(f'outputs/croppedline_{fn}')
 
 if __name__ == '__main__':
+    #challenge1a()
     #challenge1b()
     #challenge1c()
     #challenge1d()

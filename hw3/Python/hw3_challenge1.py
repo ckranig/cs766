@@ -107,13 +107,22 @@ def lineSegmentFinder(orig_img: np.ndarray, edge_img: np.ndarray, hough_img: np.
     rhos = np.linspace(-diag_len, diag_len, hough_img.shape[0])
     thetas = np.linspace(min_theta, max_theta, hough_img.shape[1])
 
-    line_img = np.copy(np.asarray(Image.fromarray(orig_img.astype(np.uint8)).convert('RGB'), dtype=np.uint8))
+    #line_img = np.copy(np.asarray(Image.fromarray(orig_img.astype(np.uint8)).convert('RGB'), dtype=np.uint8))
+    line_img = Image.fromarray(orig_img.astype(np.uint8)).convert('RGB')
+    draw = ImageDraw.Draw(line_img)
     for rho_idx, theta_idx in hough_peaks:
         #choose x = 0 and max width and then solve for y
         rho = rhos[rho_idx]
         theta = thetas[theta_idx]
         sin_t = np.sin(theta)
         cos_t = np.cos(theta)
+        
+        prev_edge = 0
+        threshold = 10
+        start_x = None
+        start_y = None
+        end_x = None
+        end_y = None
         for x in range(orig_img.shape[1]):
             y = min(max(int(((-cos_t * x) / sin_t) + (rho / sin_t)), 0), orig_img.shape[0]-1)
             #min_y = max(0, y-1)
@@ -122,8 +131,24 @@ def lineSegmentFinder(orig_img: np.ndarray, edge_img: np.ndarray, hough_img: np.
             #max_x = min(edge_img.shape[1]-1,x+1)
             #if np.any(edge_img[min_y:max_y,min_x:max_x] > 0):
             if edge_img[y,x] > 0:
-                line_img[y,x] = [255,0,0]
+                if start_x is None:
+                    start_x = x - 1
+                    start_y = min(max(int(((-cos_t * start_x) / sin_t) + (rho / sin_t)), 0), orig_img.shape[0]-1)
+                end_x = x
+                end_y = y
+                prev_edge = 0
+            else:
+                prev_edge += 1
+                if prev_edge > threshold and start_x is not None and end_x is not None:
+                    draw.line((start_x, start_y, end_x, end_y), fill=128)
+                    start_x = None
+                    start_y = None
+                    end_x = None
+                    end_y = None
 
-    line_img = Image.fromarray(line_img).convert('RGB')
+        if start_x is not None and end_x is not None:
+            draw.line((start_x, start_y, end_x, end_y), fill=128)
+
+    #line_img = Image.fromarray(line_img).convert('RGB')
     line_img.show()
     return  line_img

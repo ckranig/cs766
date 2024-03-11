@@ -11,4 +11,4 @@ I started off by sorting all of the lines by their accumulator value. I then gro
 
 # Challenge 1d
 
-For each line chosen I did a matrix multiplication with the original edge image and drew red pixels for each x,y where edge_img[x,y] >0 and line_img[x,y] > 0.
+For each line I found the beginnings and ends of each line segment by following each line that was above the threshold and checking to see if each point was within the supplied edge image. I then continued the segment until I reached a point that was either on the edge of the image or had a threshold of 10 pixels after it which were not in the edge image. I continued traversing each line finding any additional segments until I reached the end.

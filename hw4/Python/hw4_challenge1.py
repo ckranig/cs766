@@ -78,25 +78,6 @@ def showCorrespondence(img1: Image.Image, img2: Image.Image, pts1_nx2: np.ndarra
 
 # function [mask, result_img] = backwardWarpImg(src_img, resultToSrc_H, dest_canvas_width_height)
 
-def forwardWarpImg(src_img, H_3x3, canvas_shape, upperLeft):
-    dest_height, dest_width = canvas_shape
-    ret_img = np.zeros((dest_height, dest_width, 3))
-    ret_mask = np.zeros(canvas_shape)
-    src_x, src_y = np.meshgrid(np.arange(src_img.shape[1]), np.arange(src_img.shape[0]))
-    src_points = np.column_stack((src_x.flatten(), src_y.flatten()))
-    dst_points = applyHomography(H_3x3, src_points)
-    dst_points = np.round(dst_points).astype(int)
-    for i in range(dst_points.shape[0]):
-        dst_x = dst_points[i,0] + upperLeft[1]
-        dst_y = dst_points[i,1] + upperLeft[0]
-        if 0 <= dst_x and dst_x < dest_width and 0 <= dst_y and dst_y < dest_height:
-            ret_img[dst_y, dst_x] = src_img[src_points[i,1], src_points[i,0]]
-            ret_mask[dst_y, dst_x] = 1
-        else:
-            print((dst_x,dst_y))
-    return Image.fromarray((ret_img * 255).astype(np.uint8), mode="RGB"), Image.fromarray(ret_mask, mode="L")
-
-
 def backwardWarpImg(src_img: Image.Image, destToSrc_H: np.ndarray, canvas_shape: Union[Tuple, List]) -> Tuple[Image.Image, Image.Image]:
     '''
     Backward warp the source image to the destination canvas based on the
@@ -203,12 +184,9 @@ def runRANSAC(src_pt: np.ndarray, dest_pt: np.ndarray, ransac_n: int, eps: float
     return best_inliers_id, best_H
 
 def add_translation_to_homography(H, tx, ty):
-    # Create a translation matrix
     translation_matrix = np.array([[1, 0, tx],
                                    [0, 1, ty],
                                    [0, 0, 1]])
-
-    # Multiply the translation matrix with the original homography matrix
     H_new = np.dot(translation_matrix, H)
 
     return H_new
@@ -234,8 +212,8 @@ def stitchImg(*args: Image.Image) -> Image.Image:
     max_x = min_x + imgs[0].shape[1]
     max_y = min_y + imgs[0].shape[0]
     canvas[min_y:max_y, min_x:max_x, :] = imgs[0]
-    tmp = Image.fromarray((canvas * 255).astype(np.uint8), mode="RGB")
-    tmp.save('outputs/tmp_stitch_{}.png'.format(0))
+    #tmp = Image.fromarray((canvas * 255).astype(np.uint8), mode="RGB")
+    #tmp.save('outputs/tmp_stitch_{}.png'.format(0))
     for i in range(1, len(imgs)):
         curImg = imgs[i]
         canvas_mask = np.any(canvas > 0, axis=-1)
@@ -253,20 +231,20 @@ def stitchImg(*args: Image.Image) -> Image.Image:
         xd[:,1] = t_xd[:,0]
         inliers_id, H_3x3 = runRANSAC(xs, xd, 100, 2)
         after_img = showCorrespondence((curImg* 255).astype(np.uint8), (curCanv* 255).astype(np.uint8), xs[inliers_id, :], xd[inliers_id, :])
-        after_img.save('outputs/tmp_corr_{}.png'.format(i))
+        #after_img.save('outputs/tmp_corr_{}.png'.format(i))
 
         # Warp the second image onto the canvas
         H_3x3 = add_translation_to_homography(H_3x3, upper_left[1], upper_left[0])
-        #dest_img, dest_mask = forwardWarpImg(curImg, H_3x3, (max_height, max_width), upper_left)
         dest_img, dest_mask = backwardWarpImg(curImg, np.linalg.inv(H_3x3), (max_height, max_width))
-        dest_img.save('outputs/tmp_dstImg_{}.png'.format(i))
+        #dest_img.save('outputs/tmp_dstImg_{}.png'.format(i))
         # Blend the warped image onto the canvas
         newCanvas = blendImagePair(canvas, canvas_mask, np.array(dest_img)/255.0, np.array(dest_mask)/255.0, "blend")
-        newCanvas.save('outputs/tmp_stitch_{}.png'.format(i))
+        #newCanvas.save('outputs/tmp_stitch_{}.png'.format(i))
         canvas = np.array(newCanvas)/ 255.0
 
     positive_indices = np.where(canvas > 0)
     upper_left = (min(positive_indices[0]), min(positive_indices[1]))
     bottom_right = (max(positive_indices[0]), max(positive_indices[1]))
     curCanv = canvas[upper_left[0]:bottom_right[0],upper_left[1]:bottom_right[1]]
+    #curCanv = canvas[min_y:max_y,upper_left[1]:bottom_right[1],:]
     return Image.fromarray((curCanv* 255).astype(np.uint8), mode="RGB")

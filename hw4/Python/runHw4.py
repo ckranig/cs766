@@ -133,7 +133,7 @@ def challenge1b():
     result = bg_img * np.stack([mask, mask, mask], axis=2) + (np.array(dest_img)/ 255.0)
     result = Image.fromarray((result * 255).astype(np.uint8))
     result.save('outputs/Van_Gogh_in_Osaka.png')
-    dest_img.save('outputs/test.png')
+    #dest_img.save('outputs/test.png')
 
     plt.figure()
     plt.imshow(result)
@@ -223,11 +223,28 @@ def challenge1e():
     #stitched_img = Image.fromarray((stitched_img * 255).astype(np.uint8))
     stitched_img.save('outputs/stitched_img.png')
 
+def resizeImage(image: Image.Image):
+    original_width, original_height = image.size
+    new_width = original_width // 16
+    new_height = original_height // 16
+    return image.resize((new_width, new_height))
+
 # Test image stitching
 def challenge1f():
     # Take three photos of a scene, and stitch them together to form a panorama
-    raise NotImplementedError
+    from hw4_challenge1 import stitchImg
+    # stitch three images
+    img_center = np.array(resizeImage(Image.open('data/water_center.png'))) / 255.0
+    img_left = np.array(resizeImage(Image.open('data/water_left.png'))) / 255.0
+    img_right = np.array(resizeImage(Image.open('data/water_right.png'))) / 255.0
+
+    # You are free to change the order of input arguments
+    stitched_img = stitchImg(img_center, img_left, img_right)
+
+    # Save the stitched image
+    #stitched_img = Image.fromarray((stitched_img * 255).astype(np.uint8))
+    stitched_img.save('outputs/my_stitched_img.png')
 
 if __name__ == '__main__':
-    challenge1e()
-    #runHw4()
+    #challenge1f()
+    runHw4()
