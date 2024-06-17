@@ -42,7 +42,7 @@ def computeLightDirections(center: np.ndarray, radius: float, images: List[np.nd
 
         # Normalize the resulting vector to obtain a unit vector
         magnitude = np.sqrt(x_prime**2 + y_prime**2 + z_prime**2) #Used for testing
-        N = np.array([x_prime, y_prime, z_prime]) / magnitude * image[brightest_pixel] #Scale to Brightness
+        N = (np.array([x_prime, y_prime, z_prime]) / magnitude) * image[brightest_pixel] #Scale to Brightness
 
         light_dirs.append(N)
 

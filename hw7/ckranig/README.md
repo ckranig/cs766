@@ -1,0 +1,1 @@
+Used basic absolute distance for correlation calculations.
